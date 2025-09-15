@@ -9,4 +9,7 @@ UsersCollection = db.get_collection("Users")
 OwnersCollection = db.get_collection("Owners")
 
 # You can also add the items collection here for the next step
-ItemCollection = db.get_collection("items")
+ItemCollection = db.get_collection("Items")
+ChatsCollection = db.get_collection("Chats")
+PaymentsCollection = db.get_collection("Payments")
+RentalsCollection = db.get_collection("Rentals")
