@@ -1,24 +1,16 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from .config import settings
 from .models.user import UserInDB, UserType
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-async def get_db() -> AsyncIOMotorDatabase:
-    """
-    Dependency function that creates a new database client for each request
-    and closes it after the request is complete.
-    """
-    client = AsyncIOMotorClient(settings.MONGO_DATABASE_URI)
-    db = client.get_database("rent-me")
-    try:
-        yield db
-    finally:
-        client.close()
+def get_db(request: Request) -> AsyncIOMotorDatabase:
+    """Dependency to get the database instance from the app state."""
+    return request.app.db
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme), 
