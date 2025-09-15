@@ -1,11 +1,12 @@
 import motor.motor_asyncio
 from .config import settings
 
-# Create a client to connect to your MongoDB instance
 client = motor.motor_asyncio.AsyncIOMotorClient(settings.MONGO_DATABASE_URI)
+db = client.get_database("rent-me")
 
-# Get the database (it will be created if it doesn't exist)
-db = client.get_database("rent_me")
+# Define separate collections for Users and Owners
+UsersCollection = db.get_collection("users")
+OwnersCollection = db.get_collection("owners")
 
-# Get a collection for users (it will be created if it doesn't exist)
-UserCollection = db.get_collection("Users")
+# You can also add the items collection here for the next step
+ItemCollection = db.get_collection("items")
