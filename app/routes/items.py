@@ -4,7 +4,7 @@ from app.models.item import ItemModel
 from bson import ObjectId
 from typing import List
 
-router = APIRouter()
+router = APIRouter(prefix="/items", tags=["Items"])
 
 @router.get("/", response_model=List[ItemModel])
 async def get_items():

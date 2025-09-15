@@ -4,7 +4,7 @@ from app.models.rental import RentalModel
 from bson import ObjectId
 from typing import List
 
-router = APIRouter()
+router = APIRouter(prefix="/rentals", tags=["Rentals"])
 
 @router.get("/", response_model=List[RentalModel])
 async def get_rentals():

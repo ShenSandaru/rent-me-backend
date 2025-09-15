@@ -1,4 +1,3 @@
-
 # This file is intentionally left empty.
 # The database connection is now managed entirely within app/dependencies.py
 # to ensure compatibility with serverless environments.
@@ -13,9 +12,8 @@ db = client.get_database("rent_me")
 UsersCollection = db.get_collection("users")
 OwnersCollection = db.get_collection("owners")
 
-# You can also add the items collection here for the next step
-ItemCollection = db.get_collection("Items")
-ChatsCollection = db.get_collection("Chats")
-PaymentsCollection = db.get_collection("Payments")
-RentalsCollection = db.get_collection("Rentals")
-
+# Define collections for items, chats, payments, and rentals
+ItemCollection = db.get_collection("items")
+ChatsCollection = db.get_collection("chats")
+PaymentsCollection = db.get_collection("payments")
+RentalsCollection = db.get_collection("rentals")

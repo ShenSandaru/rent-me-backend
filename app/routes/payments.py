@@ -4,7 +4,7 @@ from app.models.payment import PaymentModel
 from bson import ObjectId
 from typing import List
 
-router = APIRouter()
+router = APIRouter(prefix="/payments", tags=["Payments"])
 
 @router.get("/", response_model=List[PaymentModel])
 async def get_payments():

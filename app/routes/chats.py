@@ -4,7 +4,7 @@ from app.models.chat import ChatModel
 from bson import ObjectId
 from typing import List
 
-router = APIRouter()
+router = APIRouter(prefix="/chats", tags=["Chats"])
 
 @router.get("/", response_model=List[ChatModel])
 async def get_chats():
