@@ -7,31 +7,30 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(user_data: UserCreateSchema):
-    """Registers a new user as a 'user' or 'owner', ensuring email is unique across both roles."""
-    #
-    # --- THIS IS THE CRITICAL LOGIC ---
-    # Check if the email exists in the Users collection
-    if await UsersCollection.find_one({"email": user_data.email}):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered.",
-        )
-    # Check if the email exists in the Owners collection
-    if await OwnersCollection.find_one({"email": user_data.email}):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered.",
-        )
-    # --- END OF CRITICAL LOGIC ---
-    
+    """
+    Registers a new user or owner. An email can be registered as a user and also as an owner,
+    but cannot be registered for the same role twice.
+    """
     hashed_password = get_password_hash(user_data.password)
     user_document = {"email": user_data.email, "hashed_password": hashed_password, "user_type": user_data.user_type.value}
     
-    # Insert into the appropriate collection
+    # --- MODIFIED LOGIC ---
+    # Check only the relevant collection for an existing email.
     if user_data.user_type == UserType.USER:
+        if await UsersCollection.find_one({"email": user_data.email}):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This email is already registered as a User.",
+            )
         await UsersCollection.insert_one(user_document)
-    else:
+    else: # UserType.OWNER
+        if await OwnersCollection.find_one({"email": user_data.email}):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This email is already registered as an Owner.",
+            )
         await OwnersCollection.insert_one(user_document)
+    # --- END OF MODIFIED LOGIC ---
         
     return {"message": f"{user_data.user_type.value.capitalize()} created successfully"}
 
