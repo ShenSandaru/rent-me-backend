@@ -13,7 +13,7 @@ async def register_user(user_data: UserCreateSchema, db: AsyncIOMotorDatabase = 
     Registers a new user or owner. An email can be registered as a user and also as an owner,
     but cannot be registered for the same role twice.
     """
-    collection_name = "users" if user_data.user_type == UserType.USER else "owners"
+    collection_name = "users" if user_data.user_type == UserType.USER else "owners" # lowercase
     collection = db[collection_name]
 
     if await collection.find_one({"email": user_data.email}):
@@ -31,7 +31,7 @@ async def register_user(user_data: UserCreateSchema, db: AsyncIOMotorDatabase = 
 @router.post("/login", response_model=TokenSchema)
 async def login_for_access_token(form_data: UserLoginSchema, db: AsyncIOMotorDatabase = Depends(get_db)):
     """Authenticates a user/owner from the specified collection and returns an access token."""
-    collection_name = "users" if form_data.user_type == UserType.USER else "owners"
+    collection_name = "users" if form_data.user_type == UserType.USER else "owners" # lowercase
     user = await db[collection_name].find_one({"email": form_data.email})
 
     if not user or not verify_password(form_data.password, user["hashed_password"]):
