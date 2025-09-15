@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from enum import Enum
+from datetime import datetime
 
 class UserType(str, Enum):
     USER = "user"  # Changed to lowercase
