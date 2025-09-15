@@ -1,11 +1,14 @@
 from fastapi import FastAPI
+
 from app.routes import auth, users, items, chats, payments, rentals 
 import uvicorn
+
 
 app = FastAPI(
     title="RentMe API",
     description="API for a rental application.",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan  # Use the new lifespan manager
 )
 
 # Register the routers
@@ -21,3 +24,5 @@ if __name__ == "__main__":
     # you must run `python -m app.main` from the root directory.
     # The standard is to use uvicorn directly.
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+
+
