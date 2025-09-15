@@ -8,7 +8,6 @@ app = FastAPI(
     title="RentMe API",
     description="API for a rental application.",
     version="1.0.0",
-    lifespan=lifespan  # Use the new lifespan manager
 )
 
 # Register the routers

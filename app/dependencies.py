@@ -1,21 +1,15 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from .config import settings
-from .database import get_database_client
+from .database import db
 from .models.user import UserInDB, UserType
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-async def get_db(client: AsyncIOMotorClient = Depends(get_database_client)) -> AsyncIOMotorDatabase:
-    """Dependency to get the database instance from the client."""
-    return client.get_database("rent_me")
-
 async def get_current_user(
     token: str = Depends(oauth2_scheme), 
-    db: AsyncIOMotorDatabase = Depends(get_db)
 ) -> UserInDB:
     """
     Decodes JWT, validates user type, and fetches user from the correct collection.
