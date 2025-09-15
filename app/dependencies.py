@@ -10,12 +10,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 async def get_db() -> AsyncIOMotorDatabase:
     """
-    Dependency function that creates a new database client for each request
-    and safely closes it after the request is complete. This is the most
-    reliable pattern for serverless environments like Vercel.
+    Dependency: Creates a new DB client for each request and closes it after.
+    This is the most reliable pattern for serverless environments like Vercel.
     """
     client = AsyncIOMotorClient(settings.MONGO_DATABASE_URI)
-    db = client.get_database("rent-me")
+    db = client.get_database("rent_me") # Changed database name here
     try:
         yield db
     finally:
