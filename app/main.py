@@ -1,17 +1,8 @@
 from fastapi import FastAPI
-from contextlib import asynccontextmanager
-from app.routes import auth, users
-from app.database import connect_to_mongo, close_mongo_connection
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """
-    Handles application startup and shutdown events.
-    Connects to the database on startup and closes the connection on shutdown.
-    """
-    await connect_to_mongo()
-    yield
-    await close_mongo_connection()
+from app.routes import auth, users, items, chats, payments, rentals 
+import uvicorn
+
 
 app = FastAPI(
     title="RentMe API",
@@ -23,3 +14,15 @@ app = FastAPI(
 # Register the routers
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(items.router, prefix="/items")
+app.include_router(chats.router, prefix="/chats")
+app.include_router(payments.router, prefix="/payments")
+app.include_router(rentals.router, prefix="/rentals")
+
+if __name__ == "__main__":
+    # This block is less common for FastAPI, but for it to work,
+    # you must run `python -m app.main` from the root directory.
+    # The standard is to use uvicorn directly.
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+
+
