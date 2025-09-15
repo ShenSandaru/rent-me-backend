@@ -4,14 +4,21 @@ from jose import JWTError, jwt
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from .config import settings
-from .database import get_database_client
 from .models.user import UserInDB, UserType
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-async def get_db(client: AsyncIOMotorClient = Depends(get_database_client)) -> AsyncIOMotorDatabase:
-    """Dependency to get the database instance from the client."""
-    return client.get_database("rent_me")
+async def get_db() -> AsyncIOMotorDatabase:
+    """
+    Dependency: Creates a new DB client for each request and closes it after.
+    This is the most reliable pattern for serverless environments like Vercel.
+    """
+    client = AsyncIOMotorClient(settings.MONGO_DATABASE_URI)
+    db = client.get_database("rent_me") # Changed database name here
+    try:
+        yield db
+    finally:
+        client.close()
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme), 
@@ -37,7 +44,6 @@ async def get_current_user(
         raise credentials_exception
     
     user = None
-    # Fetch from the correct collection using the injected db
     if user_type == UserType.USER.value:
         user = await db["users"].find_one({"email": email})
     elif user_type == UserType.OWNER.value:

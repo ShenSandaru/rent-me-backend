@@ -3,13 +3,13 @@ from enum import Enum
 from datetime import datetime
 
 class UserType(str, Enum):
-    USER = "user"
-    OWNER = "owner"
+    USER = "user"  # Changed to lowercase
+    OWNER = "owner" # Changed to lowercase
 
 class UserCreateSchema(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8)
-    user_type: UserType = UserType.USER
+    user_type: UserType
 
 class UserLoginSchema(BaseModel):
     email: EmailStr

@@ -1,14 +1,16 @@
 from fastapi import FastAPI
+from app.routes import auth, users
+
 
 from app.routes import auth, users, items, chats, payments, rentals 
 import uvicorn
 
 
+# The lifespan manager is removed. The app setup is minimal.
 app = FastAPI(
     title="RentMe API",
     description="API for a rental application.",
-    version="1.0.0",
-    lifespan=lifespan  # Use the new lifespan manager
+    version="1.0.0"
 )
 
 # Register the routers
