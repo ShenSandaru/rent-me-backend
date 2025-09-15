@@ -8,7 +8,8 @@ from .models.user import UserInDB, UserType
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-def get_db(request: Request) -> AsyncIOMotorDatabase:
+# This function MUST be async
+async def get_db(request: Request) -> AsyncIOMotorDatabase:
     """Dependency to get the database instance from the app state."""
     return request.app.db
 
