@@ -1,27 +1,15 @@
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from .config import settings
-from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from typing import AsyncGenerator
 
-# Create the MongoDB client and database instances
-client = AsyncIOMotorClient(settings.MONGO_DATABASE_URI)
-db = client.get_database("rent_me")
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
+async def get_database() -> AsyncGenerator[AsyncIOMotorDatabase, None]:
     """
-    Asynchronous context manager for handling the lifespan of a FastAPI application.
-    It connects to the MongoDB database on startup and closes the connection on shutdown.
+    Dependency function to get a database connection for each request.
+    Creates a new client for each request and closes it when the request is done.
     """
-    # The connection is already established, just yield
-    print("Successfully connected to MongoDB.")
-    
-    yield
-    
-    # Close the MongoDB connection
-    client.close()
-    print("MongoDB connection closed.")
-
-def get_database() -> AsyncIOMotorDatabase:
-    """Returns the database instance."""
-    return db
+    client = AsyncIOMotorClient(settings.MONGO_DATABASE_URI)
+    db = client.get_database("rent_me")
+    try:
+        yield db
+    finally:
+        client.close()

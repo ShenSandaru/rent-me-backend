@@ -1,12 +1,10 @@
 from fastapi import FastAPI
 from app.routes import auth, users, items, chats, rentals, payments
-from app.database import lifespan
 
 app = FastAPI(
     title="RentMe API",
     description="API for a rental application.",
-    version="1.0.0",
-    lifespan=lifespan
+    version="1.0.0"
 )
 
 # Register the routers
