@@ -1,16 +1,25 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from .config import settings
 from .models.user import UserInDB, UserType
-from .database import get_database # Import the new dependency function
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-# The dependency is now just the imported function
-get_db = get_database
+async def get_db() -> AsyncIOMotorDatabase:
+    """
+    Dependency function that creates a new database client for each request
+    and safely closes it after the request is complete. This is the most
+    reliable pattern for serverless environments like Vercel.
+    """
+    client = AsyncIOMotorClient(settings.MONGO_DATABASE_URI)
+    db = client.get_database("rent-me")
+    try:
+        yield db
+    finally:
+        client.close()
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme), 
@@ -35,10 +44,6 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
     
-    db = get_db() # Get the database instance
-    if db is None:
-        raise HTTPException(status_code=500, detail="Database connection not available.")
-
     user = None
     if user_type == UserType.USER.value:
         user = await db["users"].find_one({"email": email})
