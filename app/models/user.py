@@ -2,8 +2,8 @@ from pydantic import BaseModel, EmailStr, Field
 from enum import Enum
 
 class UserType(str, Enum):
-    USER = "user"
-    OWNER = "owner"
+    USER = "User"
+    OWNER = "Owner"
 
 class UserCreateSchema(BaseModel):
     email: EmailStr
