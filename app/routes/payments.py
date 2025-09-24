@@ -1,21 +1,16 @@
-from fastapi import APIRouter, HTTPException
-from app.database import db
-from app.models.payment import PaymentModel
-from bson import ObjectId
+from fastapi import APIRouter, Depends
+from ..database import get_database
+from ..models.payment import PaymentModel
 from typing import List
+from ..services import payment_service
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
-router = APIRouter()
+router = APIRouter(prefix="/payments", tags=["Payments"])
 
 @router.get("/", response_model=List[PaymentModel])
-async def get_payments():
-    payments = await db.Payments.find().to_list(100)
-    return payments
+async def get_payments(db: AsyncIOMotorDatabase = Depends(get_database)):
+    return await payment_service.get_all_payments(db)
 
 @router.post("/", response_model=PaymentModel)
-async def create_payment(payment: PaymentModel):
-    payment_dict = payment.dict(by_alias=True)
-    if payment_dict.get("_id") is None:
-        payment_dict.pop("_id", None)
-    result = await db.Payments.insert_one(payment_dict)
-    payment_dict["_id"] = result.inserted_id
-    return payment_dict
+async def create_payment(payment: PaymentModel, db: AsyncIOMotorDatabase = Depends(get_database)):
+    return await payment_service.create_new_payment(payment, db)
