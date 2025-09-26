@@ -1,8 +1,10 @@
 fastapi
 uvicorn
-motor
+motor>=3.3.0
 pydantic
 pydantic-settings
 passlib[bcrypt]
-python-jose
+python-jose[cryptography]
 email-validator
+pymongo>=4.5,<5
+python-dotenv
