@@ -1,30 +1,26 @@
-from pydantic import BaseModel, Field
-from typing import Optional
-from bson import ObjectId
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Optional, List
 from datetime import datetime
+from .user import PyObjectId # Import PyObjectId
 
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v, info=None):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return ObjectId(v)
+class MessageModel(BaseModel):
+    id: Optional[PyObjectId] = Field(default=None, alias="_id")
+    sender_id: PyObjectId # Use PyObjectId
+    content: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class ChatModel(BaseModel):
     id: Optional[PyObjectId] = Field(default=None, alias="_id")
-    rentalId: PyObjectId
-    senderId: PyObjectId
-    receiverId: PyObjectId
-    message: str
-    timestamp: Optional[datetime] = None
-    read: bool
-    # ...existing code...
+    participant_ids: List[PyObjectId] # Use PyObjectId
+    messages: List[MessageModel] = []
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
 
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        allow_population_by_field_name = True
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={PyObjectId: str},
+    )
+
+class MessageCreateSchema(BaseModel):
+    content: str

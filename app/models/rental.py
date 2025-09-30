@@ -1,33 +1,39 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
-from bson import ObjectId
 from datetime import datetime
+from enum import Enum
+from .user import PyObjectId # Import PyObjectId
 
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v, info=None):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return ObjectId(v)
+class RentalStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    ACTIVE = "active"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
 
 class RentalModel(BaseModel):
     id: Optional[PyObjectId] = Field(default=None, alias="_id")
-    itemId: PyObjectId
-    renterId: PyObjectId
-    ownerId: PyObjectId
-    qrCode: str
-    startTime: Optional[datetime] = None
-    endTime: Optional[datetime] = None
-    status: str
-    totalAmount: int
-    paymentStatus: str
+    item_id: PyObjectId # Use PyObjectId
+    renter_id: PyObjectId # Use PyObjectId
+    owner_id: PyObjectId # Use PyObjectId
+    start_date: datetime
+    end_date: datetime
+    total_price: float
+    status: RentalStatus = RentalStatus.PENDING
     createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
 
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        allow_population_by_field_name = True
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={PyObjectId: str},
+    )
+
+class RentalCreateSchema(BaseModel):
+    item_id: PyObjectId # Use PyObjectId
+    start_date: datetime
+    end_date: datetime
+
+class RentalUpdateSchema(BaseModel):
+    status: RentalStatus

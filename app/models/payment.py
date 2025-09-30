@@ -1,29 +1,30 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
-from bson import ObjectId
 from datetime import datetime
+from enum import Enum
+from .user import PyObjectId # Import PyObjectId
 
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v, info=None):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return ObjectId(v)
+class PaymentStatus(str, Enum):
+    PENDING = "pending"
+    COMPLETED = "completed"
+    FAILED = "failed"
 
 class PaymentModel(BaseModel):
     id: Optional[PyObjectId] = Field(default=None, alias="_id")
-    rentalId: PyObjectId
-    amount: int
-    method: str
-    status: str
-    transactionId: str
+    rental_id: PyObjectId # Use PyObjectId
+    payer_id: PyObjectId # Use PyObjectId
+    amount: float
+    status: PaymentStatus = PaymentStatus.PENDING
+    stripe_charge_id: Optional[str] = None
     createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
 
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        allow_population_by_field_name = True
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={PyObjectId: str},
+    )
+
+class PaymentCreateSchema(BaseModel):
+    rental_id: PyObjectId # Use PyObjectId
+    amount: float
