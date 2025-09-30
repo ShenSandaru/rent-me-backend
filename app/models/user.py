@@ -59,7 +59,7 @@ class UserModel(BaseModel):
 
 class UserCreateSchema(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=8)
+    password: str = Field(..., min_length=8, max_length=72)
     user_type: UserType
 
 class UserLoginSchema(BaseModel):
