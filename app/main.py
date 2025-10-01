@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from app.routes import auth, users, items, chats, rentals, payments
+from app.routes import auth, users, items, chats, rentals, payments, locations
+
 
 app = FastAPI(
     title="RentMe API",
@@ -14,3 +15,4 @@ app.include_router(items.router)
 app.include_router(chats.router)
 app.include_router(rentals.router)
 app.include_router(payments.router)
+app.include_router(locations.router)
